@@ -1,0 +1,6 @@
+streamlit==1.10.0
+matplotlib==3.5.1
+pandas
+seaborn
+requests
+beautifulsoup4
