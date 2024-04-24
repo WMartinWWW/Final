@@ -94,7 +94,7 @@ def main():
         beer_stats = scrape_brewers_association_stats(url)
         st.write("Brewery Statistics:", beer_stats)
 
-    file_path = st.text_input("Enter path to sales data CSV:", "/Users/w./Documents/GitHub/Final/Warehouse_and_Retail_Sales.csv")
+    file_path = st.text_input("Enter path to sales data CSV:", "Warehouse_and_Retail_Sales.csv")
     if file_path:
         sales_data, date_col = load_and_preprocess_sales_data(file_path)
         if not sales_data.empty:
