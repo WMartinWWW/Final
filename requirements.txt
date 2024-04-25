@@ -11,3 +11,6 @@ nltk # For sentiment analysis
 tensorflow # For deep learning models like LSTM
 geopandas # For advanced geographical plots
 folium # For interactive maps
+statsmodels
+nltk
+tensorflow
