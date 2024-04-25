@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from datetime import datetime
 from sklearn.cluster import KMeans
+import plotly.express as px
 import matplotlib.dates as mdates
 
 
@@ -96,22 +97,31 @@ def time_series_analysis(df_sales):
     - Understanding these trends helps in planning for future sales strategies and inventory management.
     """)
 
+@st.cache
+def perform_kmeans(features):
+    # Run the KMeans clustering on provided features
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    kmeans.fit(features)
+    return kmeans
+
 def consumer_behavior_analysis(df_sales):
     # Example: Assume df_sales has 'total_spend' and 'purchase_frequency' columns
-    # For demonstration, let's create these columns randomly
-    np.random.seed(42)
-    df_sales['total_spend'] = np.random.normal(loc=1000, scale=300, size=len(df_sales))
-    df_sales['purchase_frequency'] = np.random.poisson(lam=5, size=len(df_sales))
+    # We're generating this data for demonstration; you would replace this with your actual columns
+    if 'total_spend' not in df_sales.columns or 'purchase_frequency' not in df_sales.columns:
+        np.random.seed(42)
+        df_sales['total_spend'] = np.random.normal(loc=1000, scale=300, size=len(df_sales))
+        df_sales['purchase_frequency'] = np.random.poisson(lam=5, size=len(df_sales))
 
     # Select features for clustering
     features = df_sales[['total_spend', 'purchase_frequency']]
-    kmeans = KMeans(n_clusters=3, random_state=42)
-    kmeans.fit(features)
-    
+
+    # Perform KMeans clustering; this function is cached
+    kmeans = perform_kmeans(features)
+
     # Add cluster labels to the dataframe
     df_sales['cluster'] = kmeans.labels_
 
-    # Visualizing the clusters
+    # Visualizing the clusters using Plotly for more efficient rendering
     fig = px.scatter(df_sales, x='total_spend', y='purchase_frequency', color='cluster', title='Customer Segmentation')
     st.plotly_chart(fig)
 
