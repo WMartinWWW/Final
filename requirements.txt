@@ -1,10 +1,7 @@
 streamlit
 pandas
 plotly
-requests
-seaborn
 matplotlib
-scikit-learn
 numpy
+scikit-learn
 statsmodels
-
