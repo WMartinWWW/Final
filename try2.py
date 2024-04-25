@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import requests
 
@@ -15,13 +13,16 @@ def load_data():
     return df_sales, df_breweries
 
 def preprocess_data(df_sales, df_breweries):
-    # Example preprocessing steps
-    df_sales['Date'] = pd.to_datetime(df_sales['Date'])
+    # Creating a new 'Date' column from 'YEAR' and 'MONTH'
+    df_sales['Date'] = pd.to_datetime(df_sales['YEAR'].astype(str) + '-' + df_sales['MONTH'].astype(str))
+    # Clean up the breweries data
     df_breweries.dropna(subset=['state'], inplace=True)
     return df_sales, df_breweries
 
 def plot_growth_trends(df_sales):
-    fig = px.line(df_sales, x='Date', y='Sales', title='Growth Trends in Craft Beer Sales')
+    # Group by the new 'Date' column and sum the sales for each month
+    df_grouped = df_sales.groupby('Date').agg({'RETAIL SALES':'sum'}).reset_index()
+    fig = px.line(df_grouped, x='Date', y='RETAIL SALES', title='Growth Trends in Retail Sales')
     return fig
 
 def plot_brewery_distribution(df_breweries):
