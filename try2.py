@@ -121,7 +121,13 @@ def create_app(df_sales, df_breweries):
     st.title('Craft Beer Industry Analysis')
     st.sidebar.title('Navigation')
     analysis_choice = st.sidebar.radio('Choose Analysis', [
-        'Brewery Distribution', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis'])
+        'Brewery Distribution',
+        'Market Share Analysis',
+        'Correlation Matrix',
+        'Regression Analysis',
+        'Sales Forecasting',  # Added new function
+        'Consumer Behavior Analysis'  # Added new function
+    ])
 
     if analysis_choice == 'Brewery Distribution':
         plot_brewery_distribution(df_breweries)
@@ -131,7 +137,10 @@ def create_app(df_sales, df_breweries):
         plot_correlation_matrix(df_sales)
     elif analysis_choice == 'Regression Analysis':
         perform_regression(df_sales)
-
+    elif analysis_choice == 'Sales Forecasting':
+        sales_forecasting(df_sales)  # Implement the function call
+    elif analysis_choice == 'Consumer Behavior Analysis':
+        consumer_behavior_analysis(df_sales)  # Implement the function call
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
