@@ -1,107 +1,50 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.express as px
 import requests
-import time
-import pickle
 
-# Set page config
-st.set_page_config(page_title='Craft Beer Industry Analysis', layout='wide')
+def load_data():
+    # Load CSV data
+    df_sales = pd.read_csv('Warehouse_and_Retail_Sales.csv')
+    # API request to Open Brewery DB
+    response = requests.get("https://api.openbrewerydb.org/breweries")
+    df_breweries = pd.DataFrame(response.json())
+    return df_sales, df_breweries
 
-# Global variables
-DATA_URL = 'Warehouse_and_Retail_Sales.csv'
-BREWERS_STATS_URL = "https://www.brewersassociation.org/statistics-and-data/national-beer-stats/"
-BREWERY_API_URL = "https://api.openbrewerydb.org/breweries"
+def preprocess_data(df_sales, df_breweries):
+    # Example preprocessing steps
+    df_sales['Date'] = pd.to_datetime(df_sales['Date'])
+    df_breweries.dropna(subset=['state'], inplace=True)
+    return df_sales, df_breweries
 
+def plot_growth_trends(df_sales):
+    fig = px.line(df_sales, x='Date', y='Sales', title='Growth Trends in Craft Beer Sales')
+    return fig
 
-@st.cache
-def load_sales_data():
-    """Load and cache the sales data"""
-    data = pd.read_csv(DATA_URL)
-    return data
+def plot_brewery_distribution(df_breweries):
+    fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', hover_name='name', title='Brewery Distribution in the US')
+    return fig
 
+def create_app(df_sales, df_breweries):
+    st.title('Craft Beer Industry Analysis')
+    st.sidebar.title('Navigation')
+    analysis_choice = st.sidebar.radio('Choose Analysis', ['Growth Trends', 'Brewery Distribution'])
 
-@st.cache
-def fetch_brewers_stats(url):
-    """Fetch and cache the brewers statistics data"""
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.content  # assuming this returns the raw HTML content
-    else:
-        return "Failed to fetch data"
+    if analysis_choice == 'Growth Trends':
+        st.write('Analyzing growth trends of the craft beer industry.')
+        fig = plot_growth_trends(df_sales)
+        st.plotly_chart(fig)
 
+    elif analysis_choice == 'Brewery Distribution':
+        st.write('Distribution of breweries across the US.')
+        fig = plot_brewery_distribution(df_breweries)
+        st.plotly_chart(fig)
 
-@st.cache
-def fetch_breweries_data(api_url):
-    """Fetch and cache the breweries data"""
-    response = requests.get(api_url)
-    if response.status_code == 200:
-        return response.json()  # assuming the API returns a json response
-    else:
-        return "Failed to fetch data"
-
-
-def display_sales_data(sales_data):
-    """Display sales data related components"""
-    st.header("Sales Data Overview")
-    if not sales_data.empty:
-        st.write(sales_data.head())
-
-        st.subheader("Sales by Item Type")
-        item_type_sales = sales_data.groupby('ITEM TYPE')['RETAIL SALES'].sum().sort_values()
-        st.bar_chart(item_type_sales)
-    else:
-        st.error("No sales data to display.")
-
-
-def display_brewers_stats():
-    """Display brewers stats related components"""
-    st.header("Brewers Statistics")
-    brewers_stats_html = fetch_brewers_stats(BREWERS_STATS_URL)
-    st.markdown(brewers_stats_html, unsafe_allow_html=True)  # Displays raw HTML
-
-
-def display_breweries_data():
-    """Display breweries data related components"""
-    st.header("Breweries Data Overview")
-    breweries_data = fetch_breweries_data(BREWERY_API_URL)
-    if isinstance(breweries_data, list):  # check if the response is a valid list
-        st.write("Total Breweries:", len(breweries_data))
-        breweries_df = pd.DataFrame(breweries_data)
-        st.map(breweries_df)  # Displaying the map assumes the data has 'latitude' and 'longitude' columns
-    else:
-        st.error("No breweries data to display.")
-
-
-def main():
-    st.title("Craft Beer Industry Analysis Dashboard")
-    
-    # Load data
-    sales_data = load_sales_data()
-
-    # Display sales data components
-    display_sales_data(sales_data)
-
-    # Display brewers statistics
-    display_brewers_stats()
-
-    # Display breweries data
-    display_breweries_data()
-
-    # Assumptions and Conclusions section
-    st.header("Assumptions and Conclusions")
-    st.write("""
-        Here we could discuss the assumptions made during the analysis, such as assuming linear growth in craft beer sales, or considering only certain types of breweries for specific analyses.
-        The conclusions can cover trends observed in the data, for instance, a growing market share for craft beers, or correlations found between the number of breweries in a region and local sales volumes.
-    """)
-
-    # Interactive widgets for exploration
-    st.sidebar.header("Data Exploration Controls")
-    # Implement widgets for filtering and interacting with the dataset
-    # ...
-
-
-if __name__ == "__main__":
-    main()
-
+# Main function to run the app
+if __name__ == '__main__':
+    df_sales, df_breweries = load_data()
+    df_sales, df_breweries = preprocess_data(df_sales, df_breweries)
+    create_app(df_sales, df_breweries)
