@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import requests
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
+import requests
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-import numpy as np
 
 @st.cache(allow_output_mutation=True)
 def load_data():
@@ -18,27 +18,14 @@ def load_data():
     df_breweries = pd.DataFrame(response.json())
     return df_sales, df_breweries
 
-def plot_dynamic_time_series(df_sales):
-    if df_sales['Date'].isnull().any():
-        st.error("Invalid or missing date data detected.")
-        return None
-    min_date, max_date = df_sales['Date'].min(), df_sales['Date'].max()
-    start_date, end_date = st.sidebar.select_slider(
-        "Select Date Range:", options=pd.date_range(start=min_date, end=max_date, freq='M'),
-        value=(min_date, max_date)
-    )
-    filtered_data = df_sales[(df_sales['Date'] >= start_date) & (df_sales['Date'] <= end_date)]
-    fig = px.line(filtered_data, x='Date', y='RETAIL SALES', title='Dynamic Retail Sales Over Time')
-    return fig
-
 def plot_brewery_distribution(df_breweries):
     fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', hover_name='name', title='Brewery Distribution in the US')
-    return fig
+    st.plotly_chart(fig)
 
 def plot_market_share(df_sales):
     market_data = df_sales.groupby('ITEM TYPE')['RETAIL SALES'].sum().reset_index()
     fig = px.pie(market_data, values='RETAIL SALES', names='ITEM TYPE', title='Market Share by Item Type')
-    return fig
+    st.plotly_chart(fig)
 
 def plot_correlation_matrix(df_sales):
     correlation_matrix = df_sales.select_dtypes(include=[np.number]).corr()
@@ -72,26 +59,24 @@ def create_app(df_sales, df_breweries):
     st.title('Craft Beer Industry Analysis')
     st.sidebar.title('Navigation')
     analysis_choice = st.sidebar.radio('Choose Analysis', [
-        'Growth Trends', 'Brewery Distribution', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis'])
+        'Brewery Distribution', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis',
+        'Time Series Forecasting', 'Consumer Behavior Analysis', 'Geographical Heat Maps', 
+        'Inventory Management Insights', 'Competitive Analysis', 'Sentiment Analysis',
+        'Economic Impact Analysis', 'Supply Chain Analysis', 'Sustainability Metrics', 
+        'Interactive What-If Scenarios'])
 
-    if analysis_choice == 'Growth Trends':
-        fig = plot_dynamic_time_series(df_sales)
-        if fig:
-            st.plotly_chart(fig)
-
-    elif analysis_choice == 'Brewery Distribution':
-        fig = plot_brewery_distribution(df_breweries)
-        st.plotly_chart(fig)
-
+    if analysis_choice == 'Brewery Distribution':
+        plot_brewery_distribution(df_breweries)
     elif analysis_choice == 'Market Share Analysis':
-        fig = plot_market_share(df_sales)
-        st.plotly_chart(fig)
-
+        plot_market_share(df_sales)
     elif analysis_choice == 'Correlation Matrix':
         plot_correlation_matrix(df_sales)
-
     elif analysis_choice == 'Regression Analysis':
         perform_regression(df_sales)
+    # Mock implementation for additional functionalities:
+    else:
+        st.subheader(analysis_choice)
+        st.write(f"{analysis_choice} - Detailed implementation required based on specific data and business needs.")
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
