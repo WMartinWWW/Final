@@ -9,8 +9,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from datetime import datetime
-from statsmodels.tsa.arima.model import ARIMA
 from sklearn.cluster import KMeans
+import matplotlib.dates as mdates
 
 
 
@@ -67,33 +67,34 @@ def perform_regression(df_sales):
     The positive coefficient suggests that there is a general increase in retail sales over the months. This could indicate seasonal trends or overall growth in the market. The MSE provides a measure of the average error in our predictions, which helps us understand the accuracy of the regression model.
     """)
 
-def sales_forecasting(df_sales):
+def time_series_analysis(df_sales):
     # Ensure data is sorted and indexed by date for time series analysis
     df_sales = df_sales.sort_values('Date')
     df_sales.set_index('Date', inplace=True)
 
-    # Assuming 'RETAIL SALES' is the column to forecast
+    # Assuming 'RETAIL SALES' is the column to analyze
     sales_data = df_sales['RETAIL SALES'].astype(float)
 
-    # Fit an ARIMA model (example parameters; should be tuned for your dataset)
-    model = ARIMA(sales_data, order=(1, 1, 1))  # parameters (p,d,q) are placeholders
-    model_fit = model.fit()
-
-    # Forecasting the next 12 months
-    forecast = model_fit.forecast(steps=12)
-
-    # Plotting the forecast
+    # Plotting the historical sales data
     plt.figure(figsize=(10, 5))
-    plt.plot(sales_data, label='Historical Sales')
-    plt.plot(forecast, label='Forecasted Sales', color='red')
-    plt.title('Retail Sales Forecast')
+    plt.plot(sales_data, label='Historical Sales', color='blue')
+    plt.title('Historical Retail Sales Over Time')
     plt.xlabel('Date')
     plt.ylabel('Sales')
+    plt.gca().xaxis.set_major_locator(mdates.YearLocator())  # Set major ticks format on x-axis to yearly
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Show only years on x-axis
+    plt.gcf().autofmt_xdate()  # Auto format x-axis to fit date labels
     plt.legend()
     st.pyplot(plt)
 
-    # Display model summary
-    st.write(model_fit.summary())
+    # Displaying analytical comments
+    st.subheader("Time Series Analysis of Retail Sales")
+    st.write("""
+    **Analysis Observations:**
+    - The plot shows the trend of retail sales over time.
+    - Peaks and troughs may indicate seasonal patterns or effects of specific marketing campaigns or economic events.
+    - Understanding these trends helps in planning for future sales strategies and inventory management.
+    """)
 
 def consumer_behavior_analysis(df_sales):
     # Example: Assume df_sales has 'total_spend' and 'purchase_frequency' columns
@@ -125,8 +126,8 @@ def create_app(df_sales, df_breweries):
         'Market Share Analysis',
         'Correlation Matrix',
         'Regression Analysis',
-        'Sales Forecasting',  # Added new function
-        'Consumer Behavior Analysis'  # Added new function
+        'Time Series Analysis',  # Updated function name
+        'Consumer Behavior Analysis'
     ])
 
     if analysis_choice == 'Brewery Distribution':
@@ -137,10 +138,10 @@ def create_app(df_sales, df_breweries):
         plot_correlation_matrix(df_sales)
     elif analysis_choice == 'Regression Analysis':
         perform_regression(df_sales)
-    elif analysis_choice == 'Sales Forecasting':
-        sales_forecasting(df_sales)  # Implement the function call
+    elif analysis_choice == 'Time Series Analysis':
+        time_series_analysis(df_sales)  # Updated function call
     elif analysis_choice == 'Consumer Behavior Analysis':
-        consumer_behavior_analysis(df_sales)  # Implement the function call
+        consumer_behavior_analysis(df_sales)
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
