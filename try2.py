@@ -8,7 +8,9 @@ import requests
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from datetime import datetime
 
+# Loading and preprocessing data
 @st.cache(allow_output_mutation=True)
 def load_data():
     df_sales = pd.read_csv('Warehouse_and_Retail_Sales.csv')
@@ -43,10 +45,6 @@ def perform_regression(df_sales):
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     mse = mean_squared_error(y_test, predictions)
-    st.subheader("Regression Analysis")
-    st.write("Model Coefficients:", model.coef_)
-    st.write("Mean Squared Error:", mse)
-    # Plotting regression results
     plt.figure(figsize=(10, 6))
     plt.scatter(X_test, y_test, color='black')
     plt.plot(X_test, predictions, color='blue', linewidth=3)
@@ -54,16 +52,22 @@ def perform_regression(df_sales):
     plt.ylabel("Retail Sales")
     plt.title("Regression Analysis of Retail Sales Over Months")
     st.pyplot(plt)
+    # Display regression analysis results
+    st.subheader("Regression Analysis Results")
+    st.write("Model Coefficients:", model.coef_)
+    st.write("Intercept:", model.intercept_)
+    st.write("Mean Squared Error:", mse)
+    # Interpretation
+    st.write("### Interpretation of Regression Analysis")
+    st.write("""
+    The positive coefficient suggests that there is a general increase in retail sales over the months. This could indicate seasonal trends or overall growth in the market. The MSE provides a measure of the average error in our predictions, which helps us understand the accuracy of the regression model.
+    """)
 
 def create_app(df_sales, df_breweries):
     st.title('Craft Beer Industry Analysis')
     st.sidebar.title('Navigation')
     analysis_choice = st.sidebar.radio('Choose Analysis', [
-        'Brewery Distribution', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis',
-        'Time Series Forecasting', 'Consumer Behavior Analysis', 'Geographical Heat Maps', 
-        'Inventory Management Insights', 'Competitive Analysis', 'Sentiment Analysis',
-        'Economic Impact Analysis', 'Supply Chain Analysis', 'Sustainability Metrics', 
-        'Interactive What-If Scenarios'])
+        'Brewery Distribution', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis'])
 
     if analysis_choice == 'Brewery Distribution':
         plot_brewery_distribution(df_breweries)
@@ -73,10 +77,6 @@ def create_app(df_sales, df_breweries):
         plot_correlation_matrix(df_sales)
     elif analysis_choice == 'Regression Analysis':
         perform_regression(df_sales)
-    # Mock implementation for additional functionalities:
-    else:
-        st.subheader(analysis_choice)
-        st.write(f"{analysis_choice} - Detailed implementation required based on specific data and business needs.")
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
