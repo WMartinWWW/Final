@@ -12,15 +12,16 @@ import numpy as np
 @st.cache(allow_output_mutation=True)
 def load_data():
     df_sales = pd.read_csv('Warehouse_and_Retail_Sales.csv')
-    # Handling possible invalid date entries safely
-    df_sales['Date'] = pd.to_datetime(df_sales.assign(day=1)['YEAR'].astype(str) + '-' + df_sales['MONTH'].astype(str) + '-1', errors='coerce')
+    # Ensure there is no missing data in YEAR and MONTH before converting to datetime
+    df_sales.dropna(subset=['YEAR', 'MONTH'], inplace=True)
+    df_sales['Date'] = pd.to_datetime(df_sales['YEAR'].astype(int).astype(str) + '-' + df_sales['MONTH'].astype(int).astype(str) + '-01')
     response = requests.get("https://api.openbrewerydb.org/breweries")
     df_breweries = pd.DataFrame(response.json())
     return df_sales, df_breweries
 
 def plot_dynamic_time_series(df_sales):
     if df_sales['Date'].isnull().any():
-        st.error("Invalid date data detected.")
+        st.error("Invalid or missing date data detected.")
         return None
     min_date, max_date = df_sales['Date'].min(), df_sales['Date'].max()
     start_date, end_date = st.sidebar.select_slider(
@@ -29,10 +30,6 @@ def plot_dynamic_time_series(df_sales):
     )
     filtered_data = df_sales[(df_sales['Date'] >= start_date) & (df_sales['Date'] <= end_date)]
     fig = px.line(filtered_data, x='Date', y='RETAIL SALES', title='Dynamic Retail Sales Over Time')
-    return fig
-
-def plot_brewery_distribution(df_breweries):
-    fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', hover_name='name', title='Brewery Distribution in the US')
     return fig
 
 def plot_market_share(df_sales):
@@ -47,8 +44,9 @@ def plot_correlation_matrix(df_sales):
     st.pyplot(plt)
 
 def perform_regression(df_sales):
-    df_sales = df_sales.dropna(subset=['Month_Num', 'RETAIL SALES'])  # Ensuring clean data
-    df_sales['Month_Num'] = df_sales['Date'].dt.month
+    if 'Month_Num' not in df_sales.columns:
+        df_sales['Month_Num'] = df_sales['Date'].dt.month
+    df_sales.dropna(subset=['Month_Num', 'RETAIL SALES'], inplace=True)
     X = df_sales[['Month_Num']]
     y = df_sales['RETAIL SALES']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -62,16 +60,12 @@ def create_app(df_sales, df_breweries):
     st.title('Craft Beer Industry Analysis')
     st.sidebar.title('Navigation')
     analysis_choice = st.sidebar.radio('Choose Analysis', [
-        'Growth Trends', 'Brewery Distribution', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis'])
+        'Growth Trends', 'Market Share Analysis', 'Correlation Matrix', 'Regression Analysis'])
 
     if analysis_choice == 'Growth Trends':
         fig = plot_dynamic_time_series(df_sales)
         if fig:
             st.plotly_chart(fig)
-
-    elif analysis_choice == 'Brewery Distribution':
-        fig = plot_brewery_distribution(df_breweries)
-        st.plotly_chart(fig)
 
     elif analysis_choice == 'Market Share Analysis':
         fig = plot_market_share(df_sales)
