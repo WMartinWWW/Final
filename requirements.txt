@@ -6,3 +6,8 @@ seaborn
 matplotlib
 scikit-learn
 numpy
+statsmodels # For ARIMA, etc.
+nltk # For sentiment analysis
+tensorflow # For deep learning models like LSTM
+geopandas # For advanced geographical plots
+folium # For interactive maps
