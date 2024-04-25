@@ -2,80 +2,106 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import requests
+import time
+import pickle
 
-# Assuming the 'DATE' column in your CSV is named 'DATE' and is in a format that Pandas can parse.
-# If the column has a different name or format, you will need to adjust the code accordingly.
+# Set page config
+st.set_page_config(page_title='Craft Beer Industry Analysis', layout='wide')
+
+# Global variables
+DATA_URL = 'Warehouse_and_Retail_Sales.csv'
+BREWERS_STATS_URL = "https://www.brewersassociation.org/statistics-and-data/national-beer-stats/"
+BREWERY_API_URL = "https://api.openbrewerydb.org/breweries"
+
 
 @st.cache
-def load_data():
-    data = pd.read_csv('Warehouse_and_Retail_Sales.csv', on_bad_lines='skip')
-    # Attempt to parse the 'DATE' column and set it as the index for time series analysis
-    if 'DATE' in data.columns:
-        data['DATE'] = pd.to_datetime(data['DATE'], errors='coerce')
-        data.set_index('DATE', inplace=True)
+def load_sales_data():
+    """Load and cache the sales data"""
+    data = pd.read_csv(DATA_URL)
     return data
 
-# Main app interface
-def main():
-    st.title('Craft Beer Industry Analysis Dashboard')
 
-    # Load data
-    df = load_data()
-
-    # Sidebar - Filter settings
-    st.sidebar.header('Filter Data')
-    
-    # Filtering by supplier
-    supplier_list = df['SUPPLIER'].dropna().unique()
-    supplier = st.sidebar.multiselect('Supplier', supplier_list, default=supplier_list)
-    
-    # Filtering by item type
-    item_type_list = df['ITEM TYPE'].dropna().unique()
-    item_type = st.sidebar.multiselect('Item Type', item_type_list, default=item_type_list)
-    
-    # Filtering by date range
-    if 'DATE' in df.columns:
-        date_range = st.sidebar.date_input('Date range', [df.index.min(), df.index.max()])
-        filtered_df = df.loc[date_range[0]:date_range[1]]
+@st.cache
+def fetch_brewers_stats(url):
+    """Fetch and cache the brewers statistics data"""
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.content  # assuming this returns the raw HTML content
     else:
-        filtered_df = df
+        return "Failed to fetch data"
 
-    # Filtering data by selected supplier and item type
-    if supplier and item_type:
-        filtered_df = filtered_df[filtered_df['SUPPLIER'].isin(supplier) & filtered_df['ITEM TYPE'].isin(item_type)]
+
+@st.cache
+def fetch_breweries_data(api_url):
+    """Fetch and cache the breweries data"""
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        return response.json()  # assuming the API returns a json response
+    else:
+        return "Failed to fetch data"
+
+
+def display_sales_data(sales_data):
+    """Display sales data related components"""
+    st.header("Sales Data Overview")
+    if not sales_data.empty:
+        st.write(sales_data.head())
+
+        st.subheader("Sales by Item Type")
+        item_type_sales = sales_data.groupby('ITEM TYPE')['RETAIL SALES'].sum().sort_values()
+        st.bar_chart(item_type_sales)
+    else:
+        st.error("No sales data to display.")
+
+
+def display_brewers_stats():
+    """Display brewers stats related components"""
+    st.header("Brewers Statistics")
+    brewers_stats_html = fetch_brewers_stats(BREWERS_STATS_URL)
+    st.markdown(brewers_stats_html, unsafe_allow_html=True)  # Displays raw HTML
+
+
+def display_breweries_data():
+    """Display breweries data related components"""
+    st.header("Breweries Data Overview")
+    breweries_data = fetch_breweries_data(BREWERY_API_URL)
+    if isinstance(breweries_data, list):  # check if the response is a valid list
+        st.write("Total Breweries:", len(breweries_data))
+        breweries_df = pd.DataFrame(breweries_data)
+        st.map(breweries_df)  # Displaying the map assumes the data has 'latitude' and 'longitude' columns
+    else:
+        st.error("No breweries data to display.")
+
+
+def main():
+    st.title("Craft Beer Industry Analysis Dashboard")
     
-    # Display data table
-    st.header('Sales Data Overview')
-    st.write(filtered_df)
+    # Load data
+    sales_data = load_sales_data()
 
-    # Show statistics of the data
-    st.header('Data Statistics')
-    st.write(filtered_df.describe())
+    # Display sales data components
+    display_sales_data(sales_data)
 
-    # Plotting sales over time if 'DATE' column is available
-    if 'DATE' in df.columns:
-        st.header('Sales Over Time')
-        fig, ax = plt.subplots()
-        filtered_df.groupby(filtered_df.index).sum()['RETAIL SALES'].plot(ax=ax)
-        plt.ylabel('Total Sales')
-        st.pyplot(fig)
+    # Display brewers statistics
+    display_brewers_stats()
 
-    # Additional visualizations go here
+    # Display breweries data
+    display_breweries_data()
+
+    # Assumptions and Conclusions section
+    st.header("Assumptions and Conclusions")
+    st.write("""
+        Here we could discuss the assumptions made during the analysis, such as assuming linear growth in craft beer sales, or considering only certain types of breweries for specific analyses.
+        The conclusions can cover trends observed in the data, for instance, a growing market share for craft beers, or correlations found between the number of breweries in a region and local sales volumes.
+    """)
+
+    # Interactive widgets for exploration
+    st.sidebar.header("Data Exploration Controls")
+    # Implement widgets for filtering and interacting with the dataset
     # ...
 
-    # Download data feature
-    st.header('Download Data')
-    st.download_button(label='Download CSV', data=filtered_df.to_csv().encode('utf-8'), file_name='filtered_data.csv', mime='text/csv')
-
-    # Instructions or documentation about the app
-    st.header('About the App')
-    st.info(
-        """
-        This dashboard is designed to analyze the craft beer industry's production, 
-        distribution, and retail sales impacts. You can filter the data based on supplier, item type, 
-        and date range. The visualizations and statistics are updated in real-time based on your selections.
-        """
-    )
 
 if __name__ == "__main__":
     main()
+
