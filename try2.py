@@ -2,119 +2,80 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import requests
-from bs4 import BeautifulSoup
-import time
-import pickle
-data = pd.read_csv('Warehouse_and_Retail_Sales.csv')
 
+# Assuming the 'DATE' column in your CSV is named 'DATE' and is in a format that Pandas can parse.
+# If the column has a different name or format, you will need to adjust the code accordingly.
 
-# Function to scrape brewery statistics
-def scrape_brewers_association_stats(url):
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    data = []
-    session = requests.Session()
-    while url:
-        try:
-            response = session.get(url, headers=headers)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.content, 'html.parser')
-            table = soup.find('table')
-            if table:
-                rows = table.find_all('tr')
-                for row in rows:
-                    cells = row.find_all('td')
-                    if cells:
-                        data.append([cell.text.strip() for cell in cells])
-            next_page = soup.find('a', attrs={'rel': 'next'})
-            url = next_page['href'] if next_page else None
-        except requests.RequestException as e:
-            st.error(f"Request failed: {e}")
-            break
+@st.cache
+def load_data():
+    data = pd.read_csv('Warehouse_and_Retail_Sales.csv', on_bad_lines='skip')
+    # Attempt to parse the 'DATE' column and set it as the index for time series analysis
+    if 'DATE' in data.columns:
+        data['DATE'] = pd.to_datetime(data['DATE'], errors='coerce')
+        data.set_index('DATE', inplace=True)
     return data
 
-# Function to fetch and serialize breweries
-def fetch_and_serialize_breweries(params, filepath='breweries.pkl'):
-    base_url = "https://api.openbrewerydb.org/breweries"
-    breweries = []
-    session = requests.Session()
-    while True:
-        response = session.get(base_url, params=params)
-        if 'X-RateLimit-Reset' in response.headers:
-            time.sleep(max(0, float(response.headers['X-RateLimit-Reset']) - time.time()))
-        if not response.json():
-            break
-        for item in response.json():
-            breweries.append({'name': item['name'], 'type': item['brewery_type'], 'website': item.get('website_url')})
-        params['page'] = params.get('page', 1) + 1
-    with open(filepath, 'wb') as f:
-        pickle.dump(breweries, f)
-    return breweries
-
-# Function to load and preprocess sales data
-def load_and_preprocess_sales_data(filepath):
-    try:
-        sales_data = pd.read_csv(filepath, on_bad_lines='skip')
-        date_col = next((col for col in sales_data.columns if 'date' in col.lower()), None)
-        if not date_col:
-            st.warning("Date column not found. Proceeding without date conversion.")
-            return sales_data, None
-        sales_data[date_col] = pd.to_datetime(sales_data[date_col], errors='coerce')
-        sales_data.dropna(subset=[date_col], inplace=True)
-        return sales_data, date_col
-    except Exception as e:
-        st.error(f"Failed to load sales data: {e}")
-        return pd.DataFrame(), None
-
-# Class to manage data
-class DataManager:
-    def __init__(self, beer_stats, breweries, sales_data):
-        self.beer_stats = beer_stats
-        self.breweries = breweries
-        self.sales_data = sales_data
-
-    def save_data(self, filepath):
-        with open(filepath, 'wb') as f:
-            pickle.dump(self, f)
-        st.info(f"DataManager saved to {filepath}")
-
-    @staticmethod
-    def load_data(filepath):
-        with open(filepath, 'rb') as f:
-            return pickle.load(f)
-
-# Streamlit interface
+# Main app interface
 def main():
     st.title('Craft Beer Industry Analysis Dashboard')
-    st.sidebar.header("Data Controls")
 
-    # Data scraping and loading
-    if st.sidebar.button("Load Brewery Data"):
-        url = "https://www.brewersassociation.org/statistics-and-data/national-beer-stats/"
-        beer_stats = scrape_brewers_association_stats(url)
-        st.write("Brewery Statistics:", beer_stats)
+    # Load data
+    df = load_data()
 
-    file_path = st.text_input("Enter path to sales data CSV:", "Warehouse_and_Retail_Sales.csv")
-    if file_path:
-        sales_data, date_col = load_and_preprocess_sales_data(file_path)
-        if not sales_data.empty:
-            st.subheader("Sales Data Overview")
-            st.dataframe(sales_data.head())
+    # Sidebar - Filter settings
+    st.sidebar.header('Filter Data')
+    
+    # Filtering by supplier
+    supplier_list = df['SUPPLIER'].dropna().unique()
+    supplier = st.sidebar.multiselect('Supplier', supplier_list, default=supplier_list)
+    
+    # Filtering by item type
+    item_type_list = df['ITEM TYPE'].dropna().unique()
+    item_type = st.sidebar.multiselect('Item Type', item_type_list, default=item_type_list)
+    
+    # Filtering by date range
+    if 'DATE' in df.columns:
+        date_range = st.sidebar.date_input('Date range', [df.index.min(), df.index.max()])
+        filtered_df = df.loc[date_range[0]:date_range[1]]
+    else:
+        filtered_df = df
 
-            if date_col:
-                st.subheader("Interactive Sales Data Analysis")
-                years = st.multiselect("Select Years", options=sales_data[date_col].dt.year.unique(), default=sales_data[date_col].dt.year.unique())
-                filtered_data = sales_data[sales_data[date_col].dt.year.isin(years)]
-                fig, ax = plt.subplots()
-                sns.lineplot(data=filtered_data, x=date_col, y='RETAIL SALES', ax=ax)
-                plt.title('Retail Sales Over Time')
-                plt.xlabel('Date')
-                plt.ylabel('Sales ($)')
-                st.pyplot(fig)
-            else:
-                st.error("No date column available for plotting.")
-        else:
-            st.error("No sales data loaded. Please check the file path or data file.")
+    # Filtering data by selected supplier and item type
+    if supplier and item_type:
+        filtered_df = filtered_df[filtered_df['SUPPLIER'].isin(supplier) & filtered_df['ITEM TYPE'].isin(item_type)]
+    
+    # Display data table
+    st.header('Sales Data Overview')
+    st.write(filtered_df)
+
+    # Show statistics of the data
+    st.header('Data Statistics')
+    st.write(filtered_df.describe())
+
+    # Plotting sales over time if 'DATE' column is available
+    if 'DATE' in df.columns:
+        st.header('Sales Over Time')
+        fig, ax = plt.subplots()
+        filtered_df.groupby(filtered_df.index).sum()['RETAIL SALES'].plot(ax=ax)
+        plt.ylabel('Total Sales')
+        st.pyplot(fig)
+
+    # Additional visualizations go here
+    # ...
+
+    # Download data feature
+    st.header('Download Data')
+    st.download_button(label='Download CSV', data=filtered_df.to_csv().encode('utf-8'), file_name='filtered_data.csv', mime='text/csv')
+
+    # Instructions or documentation about the app
+    st.header('About the App')
+    st.info(
+        """
+        This dashboard is designed to analyze the craft beer industry's production, 
+        distribution, and retail sales impacts. You can filter the data based on supplier, item type, 
+        and date range. The visualizations and statistics are updated in real-time based on your selections.
+        """
+    )
 
 if __name__ == "__main__":
     main()
