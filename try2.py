@@ -45,6 +45,20 @@ def plot_market_share(df_sales):
     fig = px.pie(market_data, values='RETAIL SALES', names='ITEM TYPE', title='Market Share by Item Type')
     st.plotly_chart(fig)
 
+    # Adding a space and then the descriptive text
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    **Market Share Analysis Commentary:**
+
+    - Beer has a 26.6% market share, which is significant but less than liquor (37.1%) and wine (34.5%). This suggests a competitive marketplace with beer as a strong but not dominant player.
+    - The other categories have much smaller shares, indicating that the sales focus primarily on alcoholic beverages, with additional revenue streams from related products and supplies.
+    
+    Users can click on different parts of the chart to obtain detailed sales data.
+    """)
+
+    # Additional space if needed
+    st.markdown("<br>", unsafe_allow_html=True)
+
 def plot_correlation_matrix(df_sales):
     correlation_matrix = df_sales.select_dtypes(include=[np.number]).corr()
     plt.figure(figsize=(10, 8))
