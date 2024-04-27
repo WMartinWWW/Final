@@ -169,7 +169,7 @@ def consumer_behavior_analysis(df_sales):
         df_sales['purchase_frequency'] = np.random.poisson(lam=5, size=len(df_sales))
 
     # Select features for clustering
-   features = df_sales[['total_spend', 'purchase_frequency']]
+    features = df_sales[['total_spend', 'purchase_frequency']]
 
     # Perform KMeans clustering; this function is cached
     kmeans = perform_kmeans(features)
