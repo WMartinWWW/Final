@@ -14,7 +14,7 @@ import matplotlib.dates as mdates
 
 
 
-# Loading and preprocessing data
+# Loading the data
 @st.cache(allow_output_mutation=True)
 def load_data():
     df_sales = pd.read_csv('Warehouse_and_Retail_Sales.csv')
@@ -25,12 +25,12 @@ def load_data():
     return df_sales, df_breweries
 
 def plot_brewery_distribution(df_breweries):
-    # Title change as requested
+    
     fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', 
                          hover_name='name', title='Brewery Distribution in the US and Europe')
     st.plotly_chart(fig)
     
-    # Adding the descriptive text with a gap
+    # Adding the gap
     st.markdown("""<br>
     The map depicts brewery locations primarily concentrated in the Pacific Northwest, New England, eastern half of the United States, 
     with a notable presence on the West Coast, particularly in California. There are fewer breweries located in the central and mountain states. 
@@ -45,7 +45,7 @@ def plot_market_share(df_sales):
     fig = px.pie(market_data, values='RETAIL SALES', names='ITEM TYPE', title='Market Share by Item Type')
     st.plotly_chart(fig)
 
-    # Adding a space and then the descriptive text
+    # Adding a space
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     **Market Share Analysis Commentary:**
@@ -56,7 +56,7 @@ def plot_market_share(df_sales):
     Users can click on different parts of the chart to obtain detailed sales data.
     """)
 
-    # Additional space if needed
+    
     st.markdown("<br>", unsafe_allow_html=True)
 
 def plot_correlation_matrix(df_sales):
@@ -65,7 +65,7 @@ def plot_correlation_matrix(df_sales):
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
     st.pyplot(plt)
     
-    # Adding a space and then the descriptive text
+    # Adding a space
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     **Correlation Matrix Commentary:**
@@ -75,7 +75,7 @@ def plot_correlation_matrix(df_sales):
     - In contrast, the year variable’s negative correlation with the month might indicate data spanning multiple years, where the month's impact on sales diminishes over time.
     """)
 
-    # Additional space if needed
+  
     st.markdown("<br>", unsafe_allow_html=True)
 
 
@@ -90,7 +90,7 @@ def perform_regression(df_sales):
     predictions = model.predict(X_test)
     mse = mean_squared_error(y_test, predictions)
     
-    # Plotting the regression line and test data points
+    # Plotting the regression line
     plt.figure(figsize=(10, 6))
     plt.scatter(X_test, y_test, color='black')
     plt.plot(X_test, predictions, color='blue', linewidth=3)
@@ -99,13 +99,13 @@ def perform_regression(df_sales):
     plt.title("Regression Analysis of Retail Sales Over Months")
     st.pyplot(plt)
     
-    # Display regression analysis results, without the original interpretation
+    # Display the results
     st.subheader("Regression Analysis Results")
     st.write("Model Coefficients:", model.coef_)
     st.write("Intercept:", model.intercept_)
     st.write("Mean Squared Error:", mse)
 
-    # Adding a space and then the descriptive text
+    
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     **Regression Analysis Commentary:**
@@ -115,31 +115,31 @@ def perform_regression(df_sales):
     - The small positive slope (0.1054) suggests a slight increase in sales as months progress, but the effect is minimal.
     """)
 
-    # Additional space after the commentary
+    
     st.markdown("<br>", unsafe_allow_html=True)
 
 
 def time_series_analysis(df_sales):
-    # Ensure data is sorted and indexed by date for time series analysis
+    # For time series analysis
     df_sales = df_sales.sort_values('Date')
     df_sales.set_index('Date', inplace=True)
 
-    # Assuming 'RETAIL SALES' is the column to analyze
+
     sales_data = df_sales['RETAIL SALES'].astype(float)
 
-    # Plotting the historical sales data
+
     plt.figure(figsize=(10, 5))
     plt.plot(sales_data, label='Historical Sales', color='blue')
     plt.title('Historical Retail Sales Over Time')
     plt.xlabel('Date')
     plt.ylabel('Sales')
-    plt.gca().xaxis.set_major_locator(mdates.YearLocator())  # Set major ticks format on x-axis to yearly
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # Show only years on x-axis
-    plt.gcf().autofmt_xdate()  # Auto format x-axis to fit date labels
+    plt.gca().xaxis.set_major_locator(mdates.YearLocator()) 
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  
+    plt.gcf().autofmt_xdate()  
     plt.legend()
     st.pyplot(plt)
 
-    # Adding a space and then the new commentary
+    
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     **Time Series Analysis Commentary:**
@@ -149,20 +149,19 @@ def time_series_analysis(df_sales):
     - For instance, the end of 2019 and 2020 shows significant spikes, which could be around November and December, a common time for increased sales due to holidays.
     """)
 
-    # Additional space after the commentary
+    
     st.markdown("<br>", unsafe_allow_html=True)
 
 
 @st.cache
 def perform_kmeans(features):
-    # Run the KMeans clustering on provided features
+    # Run the KMeans clustering
     kmeans = KMeans(n_clusters=3, random_state=42)
     kmeans.fit(features)
     return kmeans
 
 def consumer_behavior_analysis(df_sales):
-    # Example: Assume df_sales has 'total_spend' and 'purchase_frequency' columns
-    # We're generating this data for demonstration; you would replace this with your actual columns
+
     if 'total_spend' not in df_sales.columns or 'purchase_frequency' not in df_sales.columns:
         np.random.seed(42)
         df_sales['total_spend'] = np.random.normal(loc=1000, scale=300, size=len(df_sales))
@@ -171,20 +170,20 @@ def consumer_behavior_analysis(df_sales):
     # Select features for clustering
     features = df_sales[['total_spend', 'purchase_frequency']]
 
-    # Perform KMeans clustering; this function is cached
+    
     kmeans = perform_kmeans(features)
 
-    # Add cluster labels to the dataframe
+   
     df_sales['cluster'] = kmeans.labels_
 
-    # Visualizing the clusters using Plotly for more efficient rendering
+    
     fig = px.scatter(df_sales, x='total_spend', y='purchase_frequency', color='cluster', title='Customer Segmentation')
     st.plotly_chart(fig)
 
-    # Output cluster centers
+    
     st.write("Cluster Centers:", kmeans.cluster_centers_)
 
-    # Adding a space before the new commentary
+    
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     **Cluster Centers Commentary:**
@@ -196,7 +195,7 @@ def consumer_behavior_analysis(df_sales):
     The plot illustrates that spending does not necessarily increase with purchase frequency. The clusters suggest that while some customers make frequent purchases, they do not always spend more. Conversely, some customers may spend large amounts in fewer visits.
     """)
 
-    # Additional space after the commentary
+    
     st.markdown("<br>", unsafe_allow_html=True)
 
 def create_main_project_page():
@@ -233,7 +232,7 @@ def create_main_project_page():
 def create_summary_of_project_page():
     st.title('Summary of Project')
     
-    # Adding CSS for common font style for main sections and specific styling for thank-you note and gotchas sections
+    
     st.markdown("""
     <style>
     .common-font {
@@ -249,7 +248,7 @@ def create_summary_of_project_page():
     </style>
     """, unsafe_allow_html=True)
     
-    # Sections using the common font
+    # Using the common font
     st.markdown('<div class="common-font"><br><b>Study Objective</b><br>- The goal was to study the craft beer industry’s production, distribution, and sales impacts. The project aimed to understand growth trends, analyze brewery distribution across the U.S., and assess the economic impact of craft beers on warehouse and retail sales. The study sought to provide stakeholders with valuable insights into production trends, market persistence, and consumer preferences, contributing to strategic discussions on industry sustainability and market development.<br>- I changed one data source in Milestones 2 because one of the data sources in Milestones 1 could not extract data well. However, my research direction has not changed.<br></div>', unsafe_allow_html=True)
     
     st.markdown('<div class="common-font"><br><b>Discoveries and Conclusions</b><br>Analysis confirms that the craft beer industry continues to grow, with an increase in market share compared to more traditional and larger breweries. The distribution pattern shows that craft beer factories are significantly concentrated in specific regions, which is related to the higher demand and consumer preferences for craft beer in the local area. Beer competes with Liquor and Wine, but it has a place in the market. Retail sales exhibit a cyclical pattern, peaking at the end of the year, possibly due to seasonal influences such as holidays.<br></div>', unsafe_allow_html=True)
@@ -259,10 +258,10 @@ def create_summary_of_project_page():
     st.markdown("<div class=\"common-font\"><br><b>Desired Skills</b><br>This project uses Python's scikit-learn library, linear regression for trend analysis, K-Means clustering for customer segmentation, and also incorporates time series prediction and analysis. Visualization tools such as Matplotlib, Seaborn, and Plotly were employed. I tried my best to apply all the content learned in DSCI510 and DSCI549.<br></div>", unsafe_allow_html=True)
 
     
-    # Adding a horizontal dividing line before the thank-you note
+    
     st.markdown('<hr>', unsafe_allow_html=True)
     
-    # Thank you note with different and stylish font
+   
     st.markdown('<div class="thanks-font"><br><b>Acknowledge</b><br>I\'d like to extend my heartfelt thanks to Professor Jeremy Abramson for the guidance and insights throughout this project. Additionally, a special note of appreciation to TA Divyank Lunkad for the unwavering support and patience in addressing my queries multiple times. Your contributions were invaluable to my learning and the successful completion of this project.<br></div>', unsafe_allow_html=True)
 
 def create_app(df_sales, df_breweries):
