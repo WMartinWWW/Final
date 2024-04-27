@@ -10,7 +10,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from datetime import datetime
 from sklearn.cluster import KMeans
-import plotly.express as px
 import matplotlib.dates as mdates
 
 
@@ -128,30 +127,54 @@ def consumer_behavior_analysis(df_sales):
     # Output cluster centers
     st.write("Cluster Centers:", kmeans.cluster_centers_)
 
+def create_main_project_page():
+    st.markdown("""
+    <style>
+    .big-font {
+        font-size:30px !important;
+        font-family: 'Haettenschweiler';
+    }
+    .regular-font {
+        font-size:20px !important;
+        font-family: 'Arial';
+    }
+    .gotchas-font {
+        font-size:18px !important;
+        font-family: 'Comic Sans MS';
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="big-font">Haotian Wang Project<br>Analysis of craft beer industry</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="regular-font">
+    - **Interactivity**: This web application allows users to interact with various data visualizations and analyses pertaining to the craft beer industry. Users can select different aspects of the industry to examine, such as sales trends, brewery distribution, and market share through dropdown menus or sliders.<br><br>
+    - **Charts and Plots Explanation**: Each chart or plot in this application provides insights into specific aspects of the craft beer market. For example, the distribution maps show the geographical spread of breweries, while pie charts and line graphs illustrate market share and sales trends over time.<br><br>
+    - **Conclusions**: After each analysis section, conclusions are drawn to summarize the findings, such as the growth trajectory of craft beers or the economic impact on local markets.<br>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="gotchas-font">**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
+
 def create_app(df_sales, df_breweries):
     st.title('Craft Beer Industry Analysis')
     st.sidebar.title('Navigation')
     analysis_choice = st.sidebar.radio('Choose Analysis', [
+        'Main Project Page',
         'Brewery Distribution',
         'Market Share Analysis',
         'Correlation Matrix',
         'Regression Analysis',
-        'Time Series Analysis',  # Updated function name
+        'Time Series Analysis',
         'Consumer Behavior Analysis'
     ])
 
-    if analysis_choice == 'Brewery Distribution':
+    if analysis_choice == 'Main Project Page':
+        create_main_project_page()
+    elif analysis_choice == 'Brewery Distribution':
         plot_brewery_distribution(df_breweries)
-    elif analysis_choice == 'Market Share Analysis':
-        plot_market_share(df_sales)
-    elif analysis_choice == 'Correlation Matrix':
-        plot_correlation_matrix(df_sales)
-    elif analysis_choice == 'Regression Analysis':
-        perform_regression(df_sales)
-    elif analysis_choice == 'Time Series Analysis':
-        time_series_analysis(df_sales)  # Updated function call
-    elif analysis_choice == 'Consumer Behavior Analysis':
-        consumer_behavior_analysis(df_sales)
+    # Other elif blocks for different pages...
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
