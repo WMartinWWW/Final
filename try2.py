@@ -89,6 +89,8 @@ def perform_regression(df_sales):
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     mse = mean_squared_error(y_test, predictions)
+    
+    # Plotting the regression line and test data points
     plt.figure(figsize=(10, 6))
     plt.scatter(X_test, y_test, color='black')
     plt.plot(X_test, predictions, color='blue', linewidth=3)
@@ -96,16 +98,26 @@ def perform_regression(df_sales):
     plt.ylabel("Retail Sales")
     plt.title("Regression Analysis of Retail Sales Over Months")
     st.pyplot(plt)
-    # Display regression analysis results
+    
+    # Display regression analysis results, without the original interpretation
     st.subheader("Regression Analysis Results")
     st.write("Model Coefficients:", model.coef_)
     st.write("Intercept:", model.intercept_)
     st.write("Mean Squared Error:", mse)
-    # Interpretation
-    st.write("### Interpretation of Regression Analysis")
-    st.write("""
-    The positive coefficient suggests that there is a general increase in retail sales over the months. This could indicate seasonal trends or overall growth in the market. The MSE provides a measure of the average error in our predictions, which helps us understand the accuracy of the regression model.
+
+    # Adding a space and then the descriptive text
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    **Regression Analysis Commentary:**
+
+    - Retail sales display a wide distribution each month, with a slight positive trend over time.
+    - The intercept indicates the base level of sales without the influence of the month.
+    - The small positive slope (0.1054) suggests a slight increase in sales as months progress, but the effect is minimal.
     """)
+
+    # Additional space after the commentary
+    st.markdown("<br>", unsafe_allow_html=True)
+
 
 def time_series_analysis(df_sales):
     # Ensure data is sorted and indexed by date for time series analysis
