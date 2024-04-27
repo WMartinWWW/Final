@@ -169,7 +169,7 @@ def consumer_behavior_analysis(df_sales):
         df_sales['purchase_frequency'] = np.random.poisson(lam=5, size=len(df_sales))
 
     # Select features for clustering
-    features = df_sales[['total_spend', 'purchase_frequency']]
+   features = df_sales[['total_spend', 'purchase_frequency']]
 
     # Perform KMeans clustering; this function is cached
     kmeans = perform_kmeans(features)
@@ -183,6 +183,21 @@ def consumer_behavior_analysis(df_sales):
 
     # Output cluster centers
     st.write("Cluster Centers:", kmeans.cluster_centers_)
+
+    # Adding a space before the new commentary
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    **Cluster Centers Commentary:**
+
+    - **Cluster 0:** High spending with moderate frequency (average spend of 1,363, average frequency of about 5).
+    - **Cluster 1:** Lower spending than Cluster 0 but similar frequency (average spend of 994, frequency around 5).
+    - **Cluster 2:** The lowest spending with a frequency akin to the others (average spend of 628, frequency also close to 5).
+    
+    The plot illustrates that spending does not necessarily increase with purchase frequency. The clusters suggest that while some customers make frequent purchases, they do not always spend more. Conversely, some customers may spend large amounts in fewer visits.
+    """)
+
+    # Additional space after the commentary
+    st.markdown("<br>", unsafe_allow_html=True)
 
 def create_main_project_page():
     st.markdown("""
