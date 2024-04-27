@@ -139,14 +139,19 @@ def time_series_analysis(df_sales):
     plt.legend()
     st.pyplot(plt)
 
-    # Displaying analytical comments
-    st.subheader("Time Series Analysis of Retail Sales")
-    st.write("""
-    **Analysis Observations:**
-    - The plot shows the trend of retail sales over time.
-    - Peaks and troughs may indicate seasonal patterns or effects of specific marketing campaigns or economic events.
-    - Understanding these trends helps in planning for future sales strategies and inventory management.
+    # Adding a space and then the new commentary
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    **Time Series Analysis Commentary:**
+
+    - There are clear seasonal spikes in sales, particularly noticeable at the ends of years, which may correspond to the holiday season when alcohol sales typically increase.
+    - The data span from 2018 to 2020 shows some form of cyclicality, with peaks around the same time each year.
+    - For instance, the end of 2019 and 2020 shows significant spikes, which could be around November and December, a common time for increased sales due to holidays.
     """)
+
+    # Additional space after the commentary
+    st.markdown("<br>", unsafe_allow_html=True)
+
 
 @st.cache
 def perform_kmeans(features):
