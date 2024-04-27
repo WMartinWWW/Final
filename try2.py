@@ -241,7 +241,7 @@ def create_summary_of_project_page():
         font-family: 'Arial'; font-size: 18px;
     }
     .thanks-font {
-        font-family: 'Georgia'; font-size: 20px; color: #114488;
+        font-family: 'Cursive'; font-size: 20px; color: #114488;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -259,35 +259,7 @@ def create_summary_of_project_page():
     st.markdown('<div class="thanks-font"><br>I\'d like to extend my heartfelt thanks to Professor Jeremy Abramson for the guidance and insights throughout this project. Additionally, a special note of appreciation to TA Divyank Lunkad for the unwavering support and patience in addressing my queries multiple times. Your contributions were invaluable to my learning and the successful completion of this project.<br></div>', unsafe_allow_html=True)
 
 def create_app(df_sales, df_breweries):
-    st.title('Craft Beer Industry Analysis')
-    st.sidebar.title('Navigation')
-    analysis_choice = st.sidebar.radio('Choose Analysis', [
-        'Main Project Page',
-        'Brewery Distribution',
-        'Market Share Analysis',
-        'Correlation Matrix',
-        'Regression Analysis',
-        'Time Series Analysis',
-        'Consumer Behavior Analysis',
-        'Summary of Project'
-    ])
-
-    if analysis_choice == 'Main Project Page':
-        create_main_project_page()
-    elif analysis_choice == 'Brewery Distribution':
-        plot_brewery_distribution(df_breweries)
-    elif analysis_choice == 'Market Share Analysis':
-        plot_market_share(df_sales)
-    elif analysis_choice == 'Correlation Matrix':
-        plot_correlation_matrix(df_sales)
-    elif analysis_choice == 'Regression Analysis':
-        perform_regression(df_sales)
-    elif analysis_choice == 'Time Series Analysis':
-        time_series_analysis(df_sales)
-    elif analysis_choice == 'Consumer Behavior Analysis':
-        consumer_behavior_analysis(df_sales)
-    elif analysis_choice == 'Summary of Project':
-        create_summary_of_project_page()
+    # Code to create the app goes here
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
