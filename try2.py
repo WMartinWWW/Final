@@ -217,7 +217,7 @@ def create_main_project_page():
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="big-font">Haotian Wang Project<br>Analysis of craft beer industry</div>', unsafe_allow_html=True)
+    st.markdown('<div class="big-font">Haotian Wang<br>Analysis of craft beer industry</div>', unsafe_allow_html=True)
 
     st.markdown("""
     <div class="regular-font">
