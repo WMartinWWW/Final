@@ -176,7 +176,16 @@ def create_app(df_sales, df_breweries):
         create_main_project_page()
     elif analysis_choice == 'Brewery Distribution':
         plot_brewery_distribution(df_breweries)
-    # Other elif blocks for different pages...
+    elif analysis_choice == 'Market Share Analysis':
+        plot_market_share(df_sales)
+    elif analysis_choice == 'Correlation Matrix':
+        plot_correlation_matrix(df_sales)
+    elif analysis_choice == 'Regression Analysis':
+        perform_regression(df_sales)
+    elif analysis_choice == 'Time Series Analysis':
+        time_series_analysis(df_sales)
+    elif analysis_choice == 'Consumer Behavior Analysis':
+        consumer_behavior_analysis(df_sales)
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
