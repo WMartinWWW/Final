@@ -25,8 +25,20 @@ def load_data():
     return df_sales, df_breweries
 
 def plot_brewery_distribution(df_breweries):
-    fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', hover_name='name', title='Brewery Distribution in the US')
+    # Title change as requested
+    fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', 
+                         hover_name='name', title='Brewery Distribution in the US and Europe')
     st.plotly_chart(fig)
+    
+    # Adding the descriptive text with a gap
+    st.markdown("""<br>
+    The map depicts brewery locations primarily concentrated in the Pacific Northwest, New England, eastern half of the United States, 
+    with a notable presence on the West Coast, particularly in California. There are fewer breweries located in the central and mountain states. 
+    Using the Brewers Association and Open Brewery DB as references, one could infer that the densest regions may correspond to states known for 
+    a vibrant craft beer scene like California, Colorado, and the Northeastern states.<br><br>
+    Users can click on the symbols on the map to view detailed longitude and latitude as well as the name of the Industry.
+    <br>""", unsafe_allow_html=True)
+
 
 def plot_market_share(df_sales):
     market_data = df_sales.groupby('ITEM TYPE')['RETAIL SALES'].sum().reset_index()
