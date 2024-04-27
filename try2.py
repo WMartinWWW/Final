@@ -151,11 +151,13 @@ def create_main_project_page():
     <div class="regular-font">
     - **Interactivity**: This web application allows users to interact with various data visualizations and analyses pertaining to the craft beer industry. Users can select different aspects of the industry to examine, such as sales trends, brewery distribution, and market share through dropdown menus or sliders.<br><br>
     - **Charts and Plots Explanation**: Each chart or plot in this application provides insights into specific aspects of the craft beer market. For example, the distribution maps show the geographical spread of breweries, while pie charts and line graphs illustrate market share and sales trends over time.<br><br>
-    - **Conclusions**: After each analysis section, conclusions are drawn to summarize the findings, such as the growth trajectory of craft beers or the economic impact on local markets.<br>
+    - **Conclusions**: After each analysis section, conclusions are drawn to summarize the findings, such as the growth trajectory of craft beers or the economic impact on local markets.<br><br>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="gotchas-font">**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="gotchas-font"><br>**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
+
+
 
 def create_app(df_sales, df_breweries):
     st.title('Craft Beer Industry Analysis')
