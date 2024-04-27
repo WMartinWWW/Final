@@ -230,36 +230,63 @@ def create_main_project_page():
     st.markdown('<div class="gotchas-font"><br>**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
 
 
-
 def create_summary_of_project_page():
     st.title('Summary of Project')
     
-    # Common font style for the main sections
+    # Common font style for the main sections and specific styling for the thank-you note
     st.markdown("""
     <style>
     .common-font {
         font-family: 'Arial'; font-size: 18px;
     }
     .thanks-font {
-        font-family: 'Cursive'; font-size: 20px; color: #114488;
+        font-family: 'Cursive'; font-size: 20px; color: white;
     }
     </style>
     """, unsafe_allow_html=True)
     
     # Sections using the common font
-    st.markdown('<div class="common-font"><br><b>Study Objective</b><br>- The goal was to study the craft beer industry’s production, distribution, and sales impacts. The project aimed to understand growth trends, analyze brewery distribution across the U.S., and assess the economic impact of craft beers on warehouse and retail sales. The study sought to provide stakeholders with valuable insights into production trends, market persistence, and consumer preferences, contributing to strategic discussions on industry sustainability and market development.<br>- I changed one data source in Milestones 2. Because one of the data sources in Milestones 1 cannot extract data well. But my research direction has not changed.<br></div>', unsafe_allow_html=True)
+    st.markdown('<div class="common-font"><br><b>Study Objective</b><br>- The goal was to study the craft beer industry’s production, distribution, and sales impacts. The project aimed to understand growth trends, analyze brewery distribution across the U.S., and assess the economic impact of craft beers on warehouse and retail sales. The study sought to provide stakeholders with valuable insights into production trends, market persistence, and consumer preferences, contributing to strategic discussions on industry sustainability and market development.<br>- I changed one data source in Milestones 2 because one of the data sources in Milestones 1 could not extract data well. However, my research direction has not changed.<br></div>', unsafe_allow_html=True)
     
     st.markdown('<div class="common-font"><br><b>Discoveries and Conclusions</b><br>Analysis confirms that the craft beer industry continues to grow, with an increase in market share compared to more traditional and larger breweries. The distribution pattern shows that craft beer factories are significantly concentrated in specific regions, which is related to the higher demand and consumer preferences for craft beer in the local area. Beer competes with Liquor and Wine, but it has a place in the market. Retail sales exhibit a cyclical pattern, peaking at the end of the year, possibly due to seasonal influences such as holidays.<br></div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="common-font"><br><b>Difficulties in Completing the Project</b><br>- Some anticipated data was incomplete or unavailable, particularly granular consumer demographic data, which limited the depth of consumer behavior analysis.<br>- Try adding different fonts in Streamlit and design a highly readable web page. I consulted a lot of information before making the current version.<br>- There was some lag when running the Consumer Behavior Analysis part. I tried to optimize the code many times.<br></div>', unsafe_allow_html=True)
+    st.markdown('<div class="common-font"><br><b>Difficulties in Completing the Project</b><br>- Some anticipated data was incomplete or unavailable, particularly granular consumer demographic data, which limited the depth of consumer behavior analysis.<br>- Attempts to add different fonts in Streamlit and design a highly readable web page led to extensive research before finalizing the current version.<br>- There was some lag when running the Consumer Behavior Analysis part. I tried to optimize the code multiple times.<br></div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="common-font"><br><b>Desired Skills</b><br>This project uses Python\'s scikit-learn library, linear regression for trend analysis, K-Means clustering for customer segmentation, and also incorporates time series prediction and analysis. Also using visualization tools such as Matplotlib, Seaborn, and Plotly. I tried my best to apply all the content learned in DSCI510 and DSCI549.<br></div>', unsafe_allow_html=True)
+    st.markdown('<div class="common-font"><br><b>Desired Skills</b><br>This project uses Python's scikit-learn library, linear regression for trend analysis, K-Means clustering for customer segmentation, and also incorporates time series prediction and analysis. Visualization tools such as Matplotlib, Seaborn, and Plotly were employed. I tried my best to apply all the content learned in DSCI510 and DSCI549.<br></div>', unsafe_allow_html=True)
     
-    # Thank you note with different font
+    # Thank you note with different and stylish font
     st.markdown('<div class="thanks-font"><br>I\'d like to extend my heartfelt thanks to Professor Jeremy Abramson for the guidance and insights throughout this project. Additionally, a special note of appreciation to TA Divyank Lunkad for the unwavering support and patience in addressing my queries multiple times. Your contributions were invaluable to my learning and the successful completion of this project.<br></div>', unsafe_allow_html=True)
 
 def create_app(df_sales, df_breweries):
-    # Code to create the app goes here
+    st.title('Craft Beer Industry Analysis')
+    st.sidebar.title('Navigation')
+    analysis_choice = st.sidebar.radio('Choose Analysis', [
+        'Main Project Page',
+        'Brewery Distribution',
+        'Market Share Analysis',
+        'Correlation Matrix',
+        'Regression Analysis',
+        'Time Series Analysis',
+        'Consumer Behavior Analysis',
+        'Summary of Project'
+    ])
+
+    if analysis_choice == 'Main Project Page':
+        create_main_project_page()
+    elif analysis_choice == 'Brewery Distribution':
+        plot_brewery_distribution(df_breweries)
+    elif analysis_choice == 'Market Share Analysis':
+        plot_market_share(df_sales)
+    elif analysis_choice == 'Correlation Matrix':
+        plot_correlation_matrix(df_sales)
+    elif analysis_choice == 'Regression Analysis':
+        perform_regression(df_sales)
+    elif analysis_choice == 'Time Series Analysis':
+        time_series_analysis(df_sales)
+    elif analysis_choice == 'Consumer Behavior Analysis':
+        consumer_behavior_analysis(df_sales)
+    elif analysis_choice == 'Summary of Project':
+        create_summary_of_project_page()
 
 if __name__ == '__main__':
     df_sales, df_breweries = load_data()
