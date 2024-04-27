@@ -64,6 +64,20 @@ def plot_correlation_matrix(df_sales):
     plt.figure(figsize=(10, 8))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
     st.pyplot(plt)
+    
+    # Adding a space and then the descriptive text
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    **Correlation Matrix Commentary:**
+
+    - Retail transfers and retail sales have a very high positive correlation (0.96), suggesting these two activities are highly synchronized.
+    - The absence of strong correlations with the month variable suggests that the retail sales and transfers are not significantly seasonal.
+    - In contrast, the year variable’s negative correlation with the month might indicate data spanning multiple years, where the month's impact on sales diminishes over time.
+    """)
+
+    # Additional space if needed
+    st.markdown("<br>", unsafe_allow_html=True)
+
 
 def perform_regression(df_sales):
     df_sales.dropna(subset=['Date', 'RETAIL SALES'], inplace=True)
