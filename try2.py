@@ -233,7 +233,7 @@ def create_main_project_page():
 def create_summary_of_project_page():
     st.title('Summary of Project')
     
-    # Common font style for the main sections and specific styling for the thank-you note
+    # Adding CSS for common font style for main sections and specific styling for thank-you note and gotchas sections
     st.markdown("""
     <style>
     .common-font {
@@ -241,6 +241,10 @@ def create_summary_of_project_page():
     }
     .thanks-font {
         font-family: 'Cursive'; font-size: 20px; color: white;
+    }
+    .gotchas-font {
+        font-size: 18px !important;
+        font-family: 'Comic Sans MS';
     }
     </style>
     """, unsafe_allow_html=True)
@@ -250,11 +254,10 @@ def create_summary_of_project_page():
     
     st.markdown('<div class="common-font"><br><b>Discoveries and Conclusions</b><br>Analysis confirms that the craft beer industry continues to grow, with an increase in market share compared to more traditional and larger breweries. The distribution pattern shows that craft beer factories are significantly concentrated in specific regions, which is related to the higher demand and consumer preferences for craft beer in the local area. Beer competes with Liquor and Wine, but it has a place in the market. Retail sales exhibit a cyclical pattern, peaking at the end of the year, possibly due to seasonal influences such as holidays.<br></div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="common-font"><br><b>Difficulties in Completing the Project</b><br>- Some anticipated data was incomplete or unavailable, particularly granular consumer demographic data, which limited the depth of consumer behavior analysis.<br>- Attempts to add different fonts in Streamlit and design a highly readable web page led to extensive research before finalizing the current version.<br>- There was some lag when running the Consumer Behavior Analysis part. I tried to optimize the code multiple times.<br></div>', unsafe_allow_html=True)
+    st.markdown('<div class="gotchas-font"><br><b>Difficulties in Completing the Project</b><br>- Some anticipated data was incomplete or unavailable, particularly granular consumer demographic data, which limited the depth of consumer behavior analysis.<br>- Attempts to add different fonts in Streamlit and design a highly readable web page led to extensive research before finalizing the current version.<br>- There was some lag when running the Consumer Behavior Analysis part. I tried to optimize the code multiple times.<br></div>', unsafe_allow_html=True)
     
     st.markdown('<div class="common-font"><br><b>Desired Skills</b><br>This project uses Python's scikit-learn library, linear regression for trend analysis, K-Means clustering for customer segmentation, and also incorporates time series prediction and analysis. Visualization tools such as Matplotlib, Seaborn, and Plotly were employed. I tried my best to apply all the content learned in DSCI510 and DSCI549.<br></div>', unsafe_allow_html=True)
-    
-    # Thank you note with different and stylish font
+
     st.markdown('<div class="thanks-font"><br>I\'d like to extend my heartfelt thanks to Professor Jeremy Abramson for the guidance and insights throughout this project. Additionally, a special note of appreciation to TA Divyank Lunkad for the unwavering support and patience in addressing my queries multiple times. Your contributions were invaluable to my learning and the successful completion of this project.<br></div>', unsafe_allow_html=True)
 
 def create_app(df_sales, df_breweries):
