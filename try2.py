@@ -256,7 +256,7 @@ def create_summary_of_project_page():
     
     st.markdown("<div class=\"common-font\"><br><b>Desired Skills</b><br>This project uses Python's scikit-learn library, linear regression for trend analysis, K-Means clustering for customer segmentation, and also incorporates time series prediction and analysis. Visualization tools such as Matplotlib, Seaborn, and Plotly were employed. I tried my best to apply all the content learned in DSCI510 and DSCI549.<br></div>", unsafe_allow_html=True)
 
-    
+    st.markdown("<div class=\"common-font\"><br><b>Next Steps</b><br>- Integrate real-time data feeds to keep the analyses up-to-date and relevant.<br>- Expand the dataset to include more variables, such as detailed consumer demographics, to refine consumer behavior analyses.<br></div>", unsafe_allow_html=True)
     
     st.markdown('<hr>', unsafe_allow_html=True)
     
