@@ -53,7 +53,7 @@ def plot_market_share(df_sales):
     - Beer has a 26.6% market share, which is significant but less than liquor (37.1%) and wine (34.5%). This suggests a competitive marketplace with beer as a strong but not dominant player.
     - The other categories have much smaller shares, indicating that the sales focus primarily on alcoholic beverages, with additional revenue streams from related products and supplies.
     
-    Users can click on different parts of the chart to obtain detailed sales data.
+    Users can click on different parts of the chart to obtain detailed sales data, or use the right slider to view specific data.
     """)
 
     
@@ -226,7 +226,7 @@ def create_main_project_page():
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="gotchas-font"><br>**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="gotchas-font"><br><br>**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
 
 
 def create_summary_of_project_page():
@@ -239,7 +239,7 @@ def create_summary_of_project_page():
         font-family: 'Arial'; font-size: 18px;
     }
     .thanks-font {
-        font-family: 'Cursive'; font-size: 20px; color: white;
+        font-family: 'Cursive'; font-size: 20px;
     }
     .gotchas-font {
         font-size: 18px !important;
