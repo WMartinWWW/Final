@@ -1,15 +1,15 @@
-import streamlit as st
-import pandas as pd
+import streamlit as st # For creating web APP.
+import pandas as pd # For data manipulation and analysis.
 import plotly.express as px
-import seaborn as sns
+import seaborn as sns # For making some attractive statistical graphics.
 import matplotlib.pyplot as plt
 import numpy as np
 import requests
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LinearRegression # For create linear regression modeling.
+from sklearn.model_selection import train_test_split 
+from sklearn.metrics import mean_squared_error # For measuring the accuracy of regression models.
 from datetime import datetime
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans # For K-means clustering.
 import matplotlib.dates as mdates
 
 
@@ -17,20 +17,24 @@ import matplotlib.dates as mdates
 # Loading the data
 @st.cache(allow_output_mutation=True)
 def load_data():
+    # Load sales data from CSV
     df_sales = pd.read_csv('Warehouse_and_Retail_Sales.csv')
-    df_sales.dropna(subset=['YEAR', 'MONTH'], inplace=True)
+    df_sales.dropna(subset=['YEAR', 'MONTH'], inplace=True) 
+    # Combine 'YEAR' and 'MONTH' to create a 'Date' column
     df_sales['Date'] = pd.to_datetime(df_sales['YEAR'].astype(int).astype(str) + '-' + df_sales['MONTH'].astype(int).astype(str) + '-01', errors='coerce')
+    # Get data from an API
     response = requests.get("https://api.openbrewerydb.org/breweries")
     df_breweries = pd.DataFrame(response.json())
     return df_sales, df_breweries
 
 def plot_brewery_distribution(df_breweries):
-    
+    # For create a scatter plot
     fig = px.scatter_geo(df_breweries, lat='latitude', lon='longitude', 
                          hover_name='name', title='Brewery Distribution in the US and Europe')
     st.plotly_chart(fig)
     
     # Adding the gap
+    # Additional explanatory text
     st.markdown("""<br>
     The map depicts brewery locations primarily concentrated in the Pacific Northwest, New England, eastern half of the United States, 
     with a notable presence on the West Coast, particularly in California. There are fewer breweries located in the central and mountain states. 
@@ -41,7 +45,9 @@ def plot_brewery_distribution(df_breweries):
 
 
 def plot_market_share(df_sales):
+    #for a pie chart.
     market_data = df_sales.groupby('ITEM TYPE')['RETAIL SALES'].sum().reset_index()
+    # Create a pie chart to represent the market share of each item type.
     fig = px.pie(market_data, values='RETAIL SALES', names='ITEM TYPE', title='Market Share by Item Type')
     st.plotly_chart(fig)
 
@@ -60,7 +66,9 @@ def plot_market_share(df_sales):
     st.markdown("<br>", unsafe_allow_html=True)
 
 def plot_correlation_matrix(df_sales):
+    # For a heatmap of correlations between numerical features in the sales data.
     correlation_matrix = df_sales.select_dtypes(include=[np.number]).corr()
+    # Create a heatmap to visualize the correlation matrix.
     plt.figure(figsize=(10, 8))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
     st.pyplot(plt)
@@ -80,13 +88,17 @@ def plot_correlation_matrix(df_sales):
 
 
 def perform_regression(df_sales):
+    # For visualize linear regression analysis on sales data.
+    # Prepare data by removing missing values and selecting the month as a feature.
     df_sales.dropna(subset=['Date', 'RETAIL SALES'], inplace=True)
     df_sales['Month_Num'] = df_sales['Date'].dt.month
     X = df_sales[['Month_Num']]
     y = df_sales['RETAIL SALES']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+     # Create and train a linear regression model.
     model = LinearRegression()
     model.fit(X_train, y_train)
+    # Predict and calculate MSE
     predictions = model.predict(X_test)
     mse = mean_squared_error(y_test, predictions)
     
@@ -124,7 +136,7 @@ def time_series_analysis(df_sales):
     df_sales = df_sales.sort_values('Date')
     df_sales.set_index('Date', inplace=True)
 
-
+     # Convert sales to float and plot a time series graph.
     sales_data = df_sales['RETAIL SALES'].astype(float)
 
 
@@ -161,7 +173,7 @@ def perform_kmeans(features):
     return kmeans
 
 def consumer_behavior_analysis(df_sales):
-
+    # For analyze consumer behavior
     if 'total_spend' not in df_sales.columns or 'purchase_frequency' not in df_sales.columns:
         np.random.seed(42)
         df_sales['total_spend'] = np.random.normal(loc=1000, scale=300, size=len(df_sales))
@@ -176,7 +188,7 @@ def consumer_behavior_analysis(df_sales):
    
     df_sales['cluster'] = kmeans.labels_
 
-    
+    # Plot clustering results in a scatter plot.
     fig = px.scatter(df_sales, x='total_spend', y='purchase_frequency', color='cluster', title='Customer Segmentation')
     st.plotly_chart(fig)
 
