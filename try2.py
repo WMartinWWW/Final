@@ -226,8 +226,7 @@ def create_main_project_page():
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="gotchas-font"><br><br>**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
-
+    st.markdown('<div class="gotchas-font"><br>**Major Gotchas**:<br>- **Performance Issues**: Some features, particularly those involving complex data processing, may experience slow load times.</div>', unsafe_allow_html=True)
 
 def create_summary_of_project_page():
     st.title('Summary of Project')
